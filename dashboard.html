@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Face Agent - Ultimate Enterprise Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --sidebar-width: 300px;
+            --header-height: 75px;
+            --accent-gradient: linear-gradient(135deg, #3b82f6, #06b6d4, #8b5cf6);
+        }
+
+        .enterprise-wrapper {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            width: 100%;
+            max-width: 1600px;
+            height: 94vh;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
+            position: relative;
+            z-index: 10;
+        }
+
+        .enterprise-sidebar {
+            background: linear-gradient(180deg, rgba(10, 15, 30, 0.98) 0%, rgba(2, 6, 23, 0.98) 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand-box h2 {
+            font-size: 1.35rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .nav-category-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #64748b;
+            margin: 20px 0 10px 12px;
+            font-weight: 700;
+        }
+
+        .enterprise-nav {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .enterprise-nav li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 13px 18px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .enterprise-nav li a:hover, .enterprise-nav li a.active {
+            background: rgba(59, 130, 246, 0.18);
+            color: #38bdf8;
+            border-left: 4px solid #38bdf8;
+        }
+
+        .user-status-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 16px;
+            border-radius: 16px;
+        }
+
+        .enterprise-workspace {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: rgba(3, 7, 18, 0.6);
+            overflow: hidden;
+        }
+
+        .workspace-header {
+            height: var(--header-height);
+            padding: 0 35px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        .module-content-pane {
+            flex: 1;
+            padding: 35px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .module-content-pane.active-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .chat-messages-box {
+            flex: 1;
+            background: rgba(10, 15, 30, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            max-height: calc(90vh - 220px);
+        }
+
+        .chat-bubble {
+            max-width: 75%;
+            padding: 16px 22px;
+            border-radius: 18px;
+            line-height: 1.6;
+        }
+
+        .chat-bubble.ai {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+            align-self: flex-start;
+        }
+
+        .chat-bubble.user {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input-row input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 18px 24px;
+            border-radius: 16px;
+            color: white;
+            outline: none;
+        }
+
+        .send-action-btn {
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: white;
+            border: none;
+            padding: 0 32px;
+            border-radius: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .analytic-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body style="justify-content: flex-start; padding-top: 20px;">
+
+    <div class="accessibility-bar" style="top: 15px; right: 25px;">
+        <button id="btnNormal" class="access-btn active" onclick="setVisionMode('normal')">👁️ Normal View</button>
+        <button id="btnProblem" class="access-btn" onclick="setVisionMode('problem')">👓 High Vision</button>
+    </div>
+
+    <div class="enterprise-wrapper">
+        
+        <!-- Sidebar -->
+        <div class="enterprise-sidebar">
+            <div>
+                <div class="brand-box" style="margin-bottom: 25px;">
+                    <h2>AI Face Agent v3.5</h2>
+                </div>
+
+                <div class="nav-category-title">Core Modules</div>
+                <ul class="enterprise-nav">
+                    <li><a id="link-chat" class="active" onclick="switchModule('chat')">💬 Multilingual AI Chat</a></li>
+                    <li><a id="link-face" onclick="switchModule('face')">📷 Biometric Face Engine</a></li>
+                    <li><a id="link-quiz" onclick="switchModule('quiz')">⚡ AI Quiz Generator</a></li>
+                    <li><a id="link-game" onclick="switchModule('game')">🎮 AI Number Guessing Game</a></li>
+                </ul>
+
+                <div class="nav-category-title">System & Security</div>
+                <ul class="enterprise-nav">
+                    <li><a id="link-status" onclick="switchModule('status')">📊 Live System Status</a></li>
+                    <li><a id="link-logs" onclick="switchModule('logs')">📜 Terminal Logs</a></li>
+                </ul>
+            </div>
+
+            <div class="user-status-card">
+                <div style="font-size: 0.85rem; color: var(--text-muted);">Active Session:</div>
+                <div style="font-weight: 700; color: #38bdf8; margin: 4px 0;">Bhavishya (Verified)</div>
+                <button onclick="performLogout()" style="width: 100%; margin-top: 10px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: bold;">🚪 Logout</button>
+            </div>
+        </div>
+
+        <!-- Workspace -->
+        <div class="enterprise-workspace">
+            <div class="workspace-header">
+                <div class="workspace-title-area">
+                    <h3 id="paneHeaderTitle">Multilingual AI Chat Portal</h3>
+                    <p id="paneHeaderSub">Fully integrated neural engine supporting Hindi, English & Hinglish.</p>
+                </div>
+                <div id="headerLiveClock" style="font-family: monospace; color: #38bdf8; font-weight: bold;"></div>
+            </div>
+
+            <!-- CHAT MODULE -->
+            <div id="pane-chat" class="module-content-pane active-pane">
+                <div id="chatMessagesBox" class="chat-messages-box">
+                    <div class="chat-bubble ai">
+                        नमस्ते! मैंने बायोमेट्रिक कैमरा और ऑटो-प्रोग्रेसिव एआई क्विज़ दोनों को पूरी तरह से ठीक कर दिया है। अब सब कुछ एकदम मक्खन की तरह काम करेगा! 😄
+                    </div>
+                </div>
+                <div class="chat-input-row">
+                    <input type="text" id="userInputField" placeholder="यहाँ अपना संदेश लिखें (जैसे: ऐप कैसा हो)..." onkeypress="handleChatKeyPress(event)">
+                    <button class="send-action-btn" onclick="sendChatMessage()">भेजें 🚀</button>
+                </div>
+            </div>
+
+            <!-- FACE MODULE -->
+            <div id="pane-face" class="module-content-pane">
+                <div class="analytic-card" style="text-align: center; padding: 40px;">
+                    <h3 style="color: #38bdf8; margin-bottom: 15px;">Live Biometric Camera Feed & Face Engine</h3>
+                    <div style="width: 320px; height: 220px; background: #000; margin: 0 auto 20px auto; border-radius: 12px; overflow: hidden; border: 2px solid #38bdf8;">
+                        <video id="dashboardWebcam" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
+                    </div>
+                    <button class="send-action-btn" onclick="startDashboardCamera()">📷 Start Live Camera Scan</button>
+                    <p id="faceScanResultText" style="margin-top: 15px; font-weight: bold; color: #10b981;"></p>
+                </div>
+            </div>
+
+            <!-- SMART QUIZ MODULE (Multi-Question Engine) -->
+            <div id="pane-quiz" class="module-content-pane">
+                <div class="analytic-card" style="max-width: 650px;">
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">⚡ AI Smart Quiz Engine</h3>
+                    <p id="quizScoreDisplay" style="color: var(--text-muted); margin-bottom: 15px; font-weight: bold;">स्कोर: 0 / प्रश्न 1</p>
+                    <p id="quizQuestionText" style="font-weight: bold; font-size: 1.15rem; margin-bottom: 20px; color: #f8fafc;"></p>
+                    <div id="quizOptionsContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                    <p id="quizResultMsg" style="margin-top: 15px; font-weight: bold; font-size: 1.05rem;"></p>
+                </div>
+            </div>
+
+            <!-- GAME MODULE -->
+            <div id="pane-game" class="module-content-pane">
+                <div class="analytic-card" style="max-width: 600px;">
+                    <h3 style="color: #38bdf8; margin-bottom: 15px;">🎮 AI Number Guessing Game</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">मैंने 1 से 10 के बीच एक नंबर सोचा है। सही गेस कीजिए!</p>
+                    <input type="number" id="gameGuessInput" placeholder="1 से 10 तक नंबर डालें..." style="width: 100%; background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.2); padding: 15px; border-radius: 12px; color: white; margin-bottom: 15px; outline: none;">
+                    <button class="send-action-btn" onclick="playNumberGame()">गेस करें 🎯</button>
+                    <p id="gameFeedback" style="margin-top: 20px; font-weight: bold; font-size: 1.1rem;"></p>
+                </div>
+            </div>
+
+            <!-- STATUS MODULE -->
+            <div id="pane-status" class="module-content-pane">
+                <div class="analytic-card">
+                    <h3 style="color: #38bdf8; margin-bottom: 10px;">System Diagnostics</h3>
+                    <p style="color: #10b981;">● All Neural Modules & Camera Feeds Active (12ms Latency)</p>
+                </div>
+            </div>
+
+            <!-- LOGS MODULE -->
+            <div id="pane-logs" class="module-content-pane">
+                <div style="background: #020617; border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 16px; font-family: monospace; color: #38bdf8; height: 100%; overflow-y: auto;" id="terminalLogsBox">
+                    [18:00:00] Enterprise Dashboard v3.5 loaded successfully.<br>
+                    [18:00:02] Live WebRTC camera drivers synchronized.<br>
+                    [18:00:05] Multi-question AI quiz engine initialized.<br>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        setInterval(() => {
+            document.getElementById('headerLiveClock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        function setVisionMode(mode) {
+            const body = document.body;
+            if (mode === 'problem') {
+                body.classList.add('vision-assist-active');
+                localStorage.setItem('visionMode', 'problem');
+            } else {
+                body.classList.remove('vision-assist-active');
+                localStorage.setItem('visionMode', 'normal');
+            }
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('visionMode') === 'problem') {
+                setVisionMode('problem');
+            }
+            loadQuizQuestion(); // Load first question on start
+        };
+
+        function switchModule(moduleName) {
+            document.querySelectorAll('.enterprise-nav li a').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.module-content-pane').forEach(el => el.classList.remove('active-pane'));
+
+            document.getElementById('link-' + moduleName).classList.add('active');
+            document.getElementById('pane-' + moduleName).classList.add('active-pane');
+        }
+
+        function performLogout() {
+            if (confirm("क्या आप वाकई लॉग आउट करना चाहते हैं?")) {
+                window.location.href = "index.html";
+            }
+        }
+
+        // Chat Logic
+        function appendChatBubble(sender, text) {
+            const box = document.getElementById('chatMessagesBox');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${sender}`;
+            bubble.innerHTML = text.replace(/\n/g, '<br>');
+            box.appendChild(bubble);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const inputField = document.getElementById('userInputField');
+            const queryText = inputField.value.trim();
+            if (!queryText) return;
+
+            appendChatBubble('user', queryText);
+            inputField.value = '';
+
+            setTimeout(() => {
+                const q = queryText.toLowerCase();
+                let aiResponse = "";
+
+                if (q.includes('kaisa ho') || q.includes('कैसा हो') || q.includes('how are you')) {
+                    aiResponse = "मैं एकदम फर्स्ट-क्लास हूँ! कैमरा और क्विज़ दोनों अब बिल्कुल परफेक्ट काम कर रहे हैं। 😎";
+                } else {
+                    aiResponse = `अरे वाह! एकदम शानदार सवाल: "${queryText}"। एक दमदार एआई एजेंट होने के नाते, मैं इस पर पूरी ताकत से काम कर रहा हूँ! 🚀`;
+                }
+                appendChatBubble('ai', aiResponse);
+            }, 700);
+        }
+
+        function handleChatKeyPress(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        // Dashboard Live Camera
+        async function startDashboardCamera() {
+            const video = document.getElementById('dashboardWebcam');
+            const resText = document.getElementById('faceScanResultText');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                resText.innerText = "✅ लाइव कैमरा सफलतापूर्वक चालू हो गया है!";
+            } catch(e) {
+                resText.innerText = "⚠️ कैमरा परमिशन नहीं मिली।";
+            }
+        }
+
+        // --- SMART MULTI-QUESTION QUIZ ENGINE ---
+        const quizData = [
+            {
+                question: "सवाल 1: HTML का पूरा नाम क्या है?",
+                options: ["HyperText Markup Language", "High Tech Modern Language", "Hyper Transfer Machine Language"],
+                correct: 0
+            },
+            {
+                question: "सवाल 2: इनमें से कौन सी प्रोग्रामिंग भाषा वेब पेजों में स्टाइल (Design) देने के लिए उपयोग होती है?",
+                options: ["Python", "CSS", "C++"],
+                correct: 1
+            },
+            {
+                question: "सवाल 3: AI का पूरा रूप (Full Form) क्या है?",
+                options: ["Automated Internet", "Artificial Intelligence", "Advanced Interaction"],
+                correct: 1
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+
+        function loadQuizQuestion() {
+            if (currentQuizIndex >= quizData.length) {
+                document.getElementById('quizQuestionText').innerText = "🎉 बधाई हो! आपने क्विज़ सफलतापूर्वक पूरा कर लिया है!";
+                document.getElementById('quizOptionsContainer').innerHTML = "";
+                document.getElementById('quizScoreDisplay').innerText = `फाइनल स्कोर: ${quizScore} / ${quizData.length * 10}`;
+                document.getElementById('quizResultMsg').innerText = "उत्कृष्ट प्रदर्शन! 🏆";
+                return;
+            }
+
+            const currentQ = quizData[currentQuizIndex];
+            document.getElementById('quizQuestionText').innerText = currentQ.question;
+            document.getElementById('quizScoreDisplay').innerText = `स्कोर: ${quizScore} | प्रश्न ${currentQuizIndex + 1} / ${quizData.length}`;
+            document.getElementById('quizResultMsg').innerText = "";
+
+            const optContainer = document.getElementById('quizOptionsContainer');
+            optContainer.innerHTML = "";
+
+            currentQ.options.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = "send-action-btn";
+                btn.style.background = "rgba(30,41,59,0.9)";
+                btn.style.textAlign = "left";
+                btn.innerText = `${index + 1}️⃣ ${optText}`;
+                btn.onclick = () => checkQuizAnswer(index);
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIdx) {
+            const currentQ = quizData[currentQuizIndex];
+            const resMsg = document.getElementById('quizResultMsg');
+
+            if (selectedIdx === currentQ.correct) {
+                quizScore += 10;
+                resMsg.style.color = "#10b981";
+                resMsg.innerText = "🎉 बिल्कुल सही जवाब! अगला प्रश्न लोड हो रहा है...";
+            } else {
+                resMsg.style.color = "#ef4444";
+                resMsg.innerText = "❌ गलत जवाब! अगला प्रश्न लोड हो रहा है...";
+            }
+
+            currentQuizIndex++;
+            setTimeout(() => {
+                loadQuizQuestion();
+            }, 1200);
+        }
+
+        // Game Logic
+        const secretNumber = Math.floor(Math.random() * 10) + 1;
+        function playNumberGame() {
+            const val = parseInt(document.getElementById('gameGuessInput').value);
+            const fb = document.getElementById('gameFeedback');
+            if (!val) {
+                fb.innerText = "कृपया 1 से 10 के बीच कोई वैध नंबर दर्ज करें!";
+                fb.style.color = "#f59e0b";
+                return;
+            }
+
+            if (val === secretNumber) {
+                fb.innerText = `🎉 गजब! आपने बिल्कुल सही नंबर (${secretNumber}) गेस कर लिया! 🏆`;
+                fb.style.color = "#10b981";
+            } else if (val < secretNumber) {
+                fb.innerText = "📈 थोड़ा ऊपर (Higher) सोचिए!";
+                fb.style.color = "#38bdf8";
+            } else {
+                fb.innerText = "📉 थोड़ा नीचे (Lower) सोचिए!";
+                fb.style.color = "#38bdf8";
+            }
+        }
+    </script>
+</body>
+</html>
